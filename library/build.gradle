@@ -1,0 +1,121 @@
+apply plugin: 'com.android.library'
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
+
+android {
+    compileSdkVersion 24
+    buildToolsVersion "24.0.2"
+
+    defaultConfig {
+        versionCode theVersionCode
+        versionName theVersionName
+        minSdkVersion theMinSdkVersion
+        targetSdkVersion theTargetSdkVersion
+        testApplicationId "com.halfhp.fig.test"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    testCompile 'junit:junit:4.12'
+    testCompile "org.mockito:mockito-core:1.10.19"
+    testCompile "org.robolectric:robolectric:3.1"
+
+    // temp fix for:
+    // https://github.com/robolectric/robolectric/issues/1932
+    testCompile 'org.khronos:opengl-api:gl1.1-android-2.1_r1'
+}
+
+task javadoc(type: Javadoc) {
+    source = android.sourceSets.main.java.srcDirs
+    classpath += project.files(android.getBootClasspath().join(File.pathSeparator))
+    failOnError false
+    options {
+        links "http://docs.oracle.com/javase/7/docs/api/"
+        linksOffline "http://d.android.com/reference","${android.sdkDirectory}/docs/reference"
+    }
+    exclude '**/BuildConfig.java'
+    exclude '**/R.java'
+}
+
+def gitUrl = 'https://github.com/halfhp/fig.git'
+install {
+    repositories.mavenInstaller {
+        pom {
+            project {
+                packaging 'aar'
+                name 'Fig'
+                description = "Configure any object from XML."
+                url gitUrl
+                licenses {
+                    license {
+                        name 'The Apache Software License, Version 2.0'
+                        url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                    }
+                }
+                developers {
+                    developer {
+                        id 'halfhp'
+                        name 'Nick Fellows'
+                        email 'halfhp@gmail.com'
+                    }
+                }
+                scm {
+                    connection gitUrl
+                    developerConnection gitUrl
+                    url gitUrl
+
+                }
+            }
+        }
+    }
+}
+
+bintray {
+
+    // these environment vars must be set when deploying to bintray.
+    // note: BINTRAY_PASSWORD is actually the api key, but naming it 'password'
+    // tells the CI environment to obfuscate the value in public logs.
+    user = System.getenv('BINTRAY_USER')
+    key = System.getenv('BINTRAY_PASSWORD')
+
+
+    configurations = ['archives']
+    pkg {
+        version {
+            name = theVersionName
+        }
+        repo = "androidplot"
+        name = "com.androidplot:androidplot-core"
+        issueTrackerUrl = "https://androidplot.jira.com"
+        websiteUrl = gitUrl
+        vcsUrl = gitUrl
+        licenses = ["Apache-2.0"]
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from android.sourceSets.main.java.srcDirs
+}
+
+javadoc {
+    options.overview = "src/main/java/overview.html"
+}
+
+artifacts {
+    archives javadocJar
+    archives sourcesJar
+}
