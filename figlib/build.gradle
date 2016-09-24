@@ -3,8 +3,8 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.jfrog.bintray'
 
 android {
-    compileSdkVersion 24
-    buildToolsVersion "24.0.2"
+    compileSdkVersion theCompileSdkVersion
+    buildToolsVersion theBuildToolsVersion
 
     defaultConfig {
         versionCode theVersionCode
@@ -13,13 +13,16 @@ android {
         targetSdkVersion theTargetSdkVersion
         testApplicationId "com.halfhp.fig.test"
     }
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-        }
-    }
+//    buildTypes {
+//        release {
+//            minifyEnabled false
+//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+//        }
+//    }
 }
+
+group = 'com.halfhp.fig'
+version = theVersionName
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
@@ -92,9 +95,9 @@ bintray {
         version {
             name = theVersionName
         }
-        repo = "androidplot"
-        name = "com.androidplot:androidplot-core"
-        issueTrackerUrl = "https://androidplot.jira.com"
+        repo = "fig"
+        name = "com.halfhp.fig:figlib"
+        issueTrackerUrl = "https://github.com/halfhp/fig/issues"
         websiteUrl = gitUrl
         vcsUrl = gitUrl
         licenses = ["Apache-2.0"]

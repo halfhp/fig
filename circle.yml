@@ -17,7 +17,7 @@ test:
     - cp -r ${HOME}/${CIRCLE_PROJECT_REPONAME}/library/build/outputs/aar/ $CIRCLE_ARTIFACTS
 
     # javadoc:
-    - cp -r ${HOME}/${CIRCLE_PROJECT_REPONAME}/librarye/build/docs/javadoc/ $CIRCLE_ARTIFACTS
+    - cp -r ${HOME}/${CIRCLE_PROJECT_REPONAME}/library/build/docs/javadoc/ $CIRCLE_ARTIFACTS
 
 
     # junit xml report:

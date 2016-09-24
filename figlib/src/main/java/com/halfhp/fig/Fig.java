@@ -4,13 +4,11 @@ import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.graphics.Color;
 import android.util.Log;
-import android.util.TypedValue;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.lang.reflect.Type;
 import java.util.HashMap;
 
 /**
@@ -198,10 +196,6 @@ public abstract class Fig {
             Object o = m.invoke(obj);
             // delve into o
             return getObjectContaining(o, rhs);
-            //} catch (NoSuchMethodException e) {
-            // TODO: log a warning
-            //    return null;
-            //}
         } else {
             // found it!
             return obj;
@@ -299,7 +293,7 @@ public abstract class Fig {
             if (paramTypes.length >= 1) {
 
                 // split on "|"
-                // TODO: add support for String args containing a |
+                // TODO: add support for String args containing a '|'
                 String[] paramStrs = value.split("\\|");
                 if (paramStrs.length == paramTypes.length) {
 

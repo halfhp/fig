@@ -11,6 +11,7 @@ public class FigTest {
 
     class A {
         int d = 0;
+        private boolean aBooleanPrimitive = false;
 
         public int getD() {
             return d;
@@ -18,6 +19,14 @@ public class FigTest {
 
         public void setD(int d) {
             this.d = d;
+        }
+
+        public boolean isaBooleanPrimitive() {
+            return aBooleanPrimitive;
+        }
+
+        public void setaBooleanPrimitive(boolean aBooleanPrimitive) {
+            this.aBooleanPrimitive = aBooleanPrimitive;
         }
     }
 
@@ -71,5 +80,10 @@ public class FigTest {
         Method m = Fig.getSetter(c.getClass(), "b");
         assertEquals(1, m.getParameterTypes().length);
         assertEquals(B.class, m.getParameterTypes()[0]);
+    }
+
+    @Test
+    public void testGetBooleanPrimitive() throws Exception {
+        // TODO
     }
 }
