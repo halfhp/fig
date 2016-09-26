@@ -1,5 +1,7 @@
 # Fig
 A utility for Android apps to easily configure any object from XML.
+
+![image](docs/images/fig.png)
  
 ## Why Use It?
 
