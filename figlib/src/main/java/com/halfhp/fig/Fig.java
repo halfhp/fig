@@ -248,6 +248,21 @@ public abstract class Fig {
         }
     }
 
+    public static void configure(Context ctx, Object obj, HashMap<String, String> params) {
+        for (String key : params.keySet()) {
+            try {
+                configure(ctx, obj, key, params.get(key));
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (NoSuchMethodException e) {
+                Log.w(TAG, "Error inflating XML: Setter for field \"" + key + "\" does not exist. ");
+                e.printStackTrace();
+            }
+        }
+    }
+
     protected static void configure(Context ctx, Object obj, XmlPullParser xrp) {
         try {
             HashMap<String, String> params = new HashMap<String, String>();
@@ -262,18 +277,7 @@ public abstract class Fig {
                     break;
                 }
             }
-            for (String key : params.keySet()) {
-                try {
-                    configure(ctx, obj, key, params.get(key));
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (NoSuchMethodException e) {
-                    Log.w(TAG, "Error inflating XML: Setter for field \"" + key + "\" does not exist. ");
-                    e.printStackTrace();
-                }
-            }
+            configure(ctx, obj, params);
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
