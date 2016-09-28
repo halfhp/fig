@@ -7,7 +7,7 @@ import java.util.*;
 import java.util.regex.*;
 
 /**
- * Created by halfhp on 9/23/16.
+ * Utilities used by {@link Fig}.
  */
 abstract class FigUtils {
 
@@ -55,8 +55,7 @@ abstract class FigUtils {
         // Match target against pattern.
         Matcher matcher = DIMENSION_PATTERN.matcher(dimension);
         if (matcher.matches()) {
-            // Match found.
-            // Extract value.
+            // Match found; extract value.
             float value = Float.valueOf(matcher.group(1));
             // Extract dimension units.
             String unit = matcher.group(3).toLowerCase();

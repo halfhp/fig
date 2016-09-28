@@ -5,11 +5,24 @@ A utility for Android apps to easily configure any object from XML.
  
 ## Why Use It?
 
-* Incredibly simple to use.
-* Configure any class, not just your own.
+* Configure virtually any object; instances of Paint, View, etc.
 * Supports `sp`, `dp`, `pix`, `pt`, `in`, `mm` and `color` params.
+* Keep your UI code where it belongs: store configurations by screen size and density using standard Android resource directory conventions.
+* Incredibly simple to use.
 
 # Usage
+In a nutshell, Fig uses JavaBean naming conventions to map XML parameters to objects:
+
+```java
+Button b = ...
+b.getPaint().setColor(Color.RED);
+```
+
+becomes:
+
+```xml
+b.paint.color="@color/red"
+```
 
 ### Gradle Dependency
 
@@ -61,7 +74,16 @@ is accessible via Standard Java Bean getter and the target property also has a s
 ```
 
 ### Standard JavaBean Setters/Getters
-Fig
+If you use IntelliJ or Android Studio to auto generate your setters and getters, you can safely skip 
+this section.  If you're using another IDE or are just curious, read on.
+
+When using Fig, there are two conventions to follow:
+
+* Setters begin with lower-case "set" followed by the name of the property being set, eg. `setFoo(...)`.
+* Getters begin with lower-case "get" followed by the name of the property being retrieved, `eg. getFoo()`.
+
+The JavaBean spec has more to say on casing conventions etc, but Fig's matching is case insensitive so
+feel free to use whatever casing convention you prefer.
 
 # Fig & Obfuscation
 Fig uses runtime reflection to configure object instances and relies on  class method names remaining 

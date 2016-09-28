@@ -4,9 +4,10 @@ import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.graphics.Color;
 import android.util.Log;
-import org.xmlpull.v1.XmlPullParserException;
 
-import java.io.IOException;
+import org.xmlpull.v1.*;
+
+import java.io.*;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
@@ -82,7 +83,6 @@ import java.util.HashMap;
  * <config thingy.description="@string/thingyDescription"
  * thingy.titlePaint.textSize=""/>
  */
-@SuppressWarnings("WeakerAccess")
 public abstract class Fig {
 
     private static final String TAG = Fig.class.getName();
@@ -142,26 +142,26 @@ public abstract class Fig {
         }
     }
 
-
-    protected static Method getSetter(Class clazz, final String fieldId) throws NoSuchMethodException {
-        Method[] methods = clazz.getMethods();
-
-        String methodName = "set" + fieldId;
+    protected static Method getMethodByName(Class clazz, final String methodName)
+            throws NoSuchMethodException {
+        final Method[] methods = clazz.getMethods();
         for (Method method : methods) {
             if (method.getName().equalsIgnoreCase(methodName)) {
                 return method;
             }
         }
+
         throw new NoSuchMethodException("No such public method (case insensitive): " +
                 methodName + " in " + clazz);
     }
 
-    @SuppressWarnings("unchecked")
+
+    protected static Method getSetter(Class clazz, final String fieldId) throws NoSuchMethodException {
+        return getMethodByName(clazz, "set" + fieldId);
+    }
+
     protected static Method getGetter(Class clazz, final String fieldId) throws NoSuchMethodException {
-        Log.d(TAG, "Attempting to find getter for " + fieldId + " in class " + clazz.getName());
-        String firstLetter = fieldId.substring(0, 1);
-        String methodName = "get" + firstLetter.toUpperCase() + fieldId.substring(1, fieldId.length());
-        return clazz.getMethod(methodName);
+        return getMethodByName(clazz, "get" + fieldId);
     }
 
     /**
@@ -202,8 +202,7 @@ public abstract class Fig {
         }
     }
 
-    @SuppressWarnings("unchecked")
-    private static Object[] inflateParams(Context ctx, Class[] params, String[] vals) throws NoSuchMethodException,
+    protected static Object[] inflateParams(Context ctx, Class[] params, String[] vals) throws NoSuchMethodException,
             InvocationTargetException, IllegalAccessException {
         Object[] out = new Object[params.length];
         int i = 0;
@@ -228,13 +227,28 @@ public abstract class Fig {
     }
 
     /**
-     *
+     * Configure from a File.
      * @param ctx
-     * @param obj
-     * @param xmlFileId ID of the XML config file within /res/xml
+     * @param obj The object to be configured
+     * @param file The file containing the config xml.
      */
-    public static void configure(Context ctx, Object obj, int xmlFileId) {
-        XmlResourceParser xrp = ctx.getResources().getXml(xmlFileId);
+    public static void configure(Context ctx, Object obj, File file) {
+
+        try {
+            XmlPullParserFactory xppf = XmlPullParserFactory.newInstance();
+            xppf.setNamespaceAware(true);
+            XmlPullParser xpp = xppf.newPullParser();
+            FileInputStream fis = new FileInputStream(file);
+            xpp.setInput(fis, null);
+            configure(ctx, obj, xpp);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (XmlPullParserException e) {
+            e.printStackTrace();
+        }
+    }
+
+    protected static void configure(Context ctx, Object obj, XmlPullParser xrp) {
         try {
             HashMap<String, String> params = new HashMap<String, String>();
             while (xrp.getEventType() != XmlResourceParser.END_DOCUMENT) {
@@ -248,28 +262,37 @@ public abstract class Fig {
                     break;
                 }
             }
-            configure(ctx, obj, params);
+            for (String key : params.keySet()) {
+                try {
+                    configure(ctx, obj, key, params.get(key));
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (NoSuchMethodException e) {
+                    Log.w(TAG, "Error inflating XML: Setter for field \"" + key + "\" does not exist. ");
+                    e.printStackTrace();
+                }
+            }
         } catch (XmlPullParserException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
-        } finally {
-            xrp.close();
         }
     }
 
-    public static void configure(Context ctx, Object obj, HashMap<String, String> params) {
-        for (String key : params.keySet()) {
-            try {
-                configure(ctx, obj, key, params.get(key));
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                Log.w(TAG, "Error inflating XML: Setter for field \"" + key + "\" does not exist. ");
-                e.printStackTrace();
-            }
+    /**
+     * Configure from a res/xml resource
+     * @param ctx
+     * @param obj The object to be configured
+     * @param xmlFileId ID of an XML config file in /res/xml
+     */
+    public static void configure(Context ctx, Object obj, int xmlFileId) {
+        XmlResourceParser xrp = ctx.getResources().getXml(xmlFileId);
+        try {
+            configure(ctx, obj, xrp);
+        } finally {
+            xrp.close();
         }
     }
 
@@ -305,7 +328,7 @@ public abstract class Fig {
                             + m.getName() + "\".  Expected: " + paramTypes.length + " Got: " + paramStrs.length);
                 }
             } else {
-                // Obvious this is not a setter
+                // this is not a setter
                 throw new IllegalArgumentException("Error inflating XML: no setter method found for param \"" +
                         fieldId + "\".");
             }

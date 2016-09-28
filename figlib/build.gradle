@@ -13,12 +13,6 @@ android {
         targetSdkVersion theTargetSdkVersion
         testApplicationId "com.halfhp.fig.test"
     }
-//    buildTypes {
-//        release {
-//            minifyEnabled false
-//            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-//        }
-//    }
 }
 
 group = 'com.halfhp.fig'

@@ -2,16 +2,27 @@ package com.halfhp.fig;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.RobolectricTestRunner;
+import org.robolectric.*;
+import org.robolectric.annotation.*;
+
+import java.io.*;
 import java.lang.reflect.Method;
+import java.net.*;
+
 import static junit.framework.Assert.assertEquals;
+import static junit.framework.Assert.assertFalse;
+import static junit.framework.Assert.assertTrue;
+//import com.halfhp.fig.test.R;
 
 @RunWith(RobolectricTestRunner.class)
+//@Config(resourceDir = "figLib/test/res",
+//        manifest = "figLib/src/main/java/AndroidManifest.xml")
+@Config(manifest=Config.NONE)
 public class FigTest {
 
     class A {
         int d = 0;
-        private boolean aBooleanPrimitive = false;
+        private boolean aBooleanPrimitive;
 
         public int getD() {
             return d;
@@ -83,7 +94,21 @@ public class FigTest {
     }
 
     @Test
-    public void testGetBooleanPrimitive() throws Exception {
-        // TODO
+    public void testConfigure() throws Exception {
+        C c = new C();
+        assertFalse(c.getB().getA().isaBooleanPrimitive());
+        assertEquals(0, c.getB().getA().getD());
+
+        // load xml config and verify:
+        File f = getFileFromPath("c_config.xml");
+        Fig.configure(RuntimeEnvironment.application, c, f);
+        assertTrue(c.getB().getA().isaBooleanPrimitive());
+        assertEquals(99, c.getB().getA().getD());
+    }
+
+    private File getFileFromPath(String fileName) {
+        ClassLoader classLoader = getClass().getClassLoader();
+        URL resource = classLoader.getResource(fileName);
+        return new File(resource.getPath());
     }
 }
