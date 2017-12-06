@@ -88,14 +88,28 @@ public abstract class Fig {
     private static final String TAG = Fig.class.getName();
     protected static final String CFG_ELEMENT_NAME = "config";
 
+    /**
+     * Parses a resource id either as a raw string ref such as '@dimen/some_resource' or
+     * as a reference such as '@1234342'.
+     * @param ctx
+     * @param prefix
+     * @param value
+     * @return The int resourceId corresponding to the input.
+     * @throws IllegalArgumentException If the resoureId cannot be obtained from the input.
+     */
     protected static int parseResId(Context ctx, String prefix, String value) {
-        String[] split = value.split("/");
-        // is this a localized resource?
-        if (split.length > 1 && split[0].equalsIgnoreCase(prefix)) {
-            String pack = split[0].replace("@", "");
-            String name = split[1];
-            return ctx.getResources().getIdentifier(name, pack, ctx.getPackageName());
-        } else {
+        if(value.startsWith("@")){
+            if(value.contains("/")) {
+                String[] split = value.split("/");
+                String pack = split[0].replace("@", "");
+                String name = split[1];
+                return ctx.getResources().getIdentifier(name, pack, ctx.getPackageName());
+            } else {
+                // starting with gradle tools 3.0.1, it appears that dimen refs are now inlined
+                // at compile time using the form '@intRef'
+                return Integer.parseInt(value.substring(1));
+            }
+        }  else {
             throw new IllegalArgumentException();
         }
     }
@@ -323,7 +337,6 @@ public abstract class Fig {
                 // TODO: add support for String args containing a '|'
                 String[] paramStrs = value.split("\\|");
                 if (paramStrs.length == paramTypes.length) {
-
                     Object[] oa = inflateParams(ctx, paramTypes, paramStrs);
                     Log.d(TAG, "Invoking " + m.getName() + " with arg(s) " + argArrToString(oa));
                     m.invoke(o, oa);

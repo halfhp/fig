@@ -1,2 +1,3 @@
+include ':demoapp'
 rootProject.name = 'fig'
 include 'figlib'

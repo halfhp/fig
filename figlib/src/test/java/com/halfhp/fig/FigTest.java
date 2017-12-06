@@ -21,7 +21,9 @@ import static junit.framework.Assert.assertTrue;
 public class FigTest {
 
     class A {
-        int d = 0;
+        private int d = 0;
+        private float f = 0;
+        private float p = 0;
         private boolean aBooleanPrimitive;
 
         public int getD() {
@@ -39,10 +41,26 @@ public class FigTest {
         public void setaBooleanPrimitive(boolean aBooleanPrimitive) {
             this.aBooleanPrimitive = aBooleanPrimitive;
         }
+
+        public float getF() {
+            return f;
+        }
+
+        public void setF(float f) {
+            this.f = f;
+        }
+
+        public float getP() {
+            return p;
+        }
+
+        public void setP(float p) {
+            this.p = p;
+        }
     }
 
     class B {
-        A a = new A();
+        private A a = new A();
 
         public A getA() {
             return a;
@@ -54,7 +72,7 @@ public class FigTest {
     }
 
     class C {
-        B b = new B();
+        private B b = new B();
 
         public B getB() {
             return b;
@@ -104,6 +122,8 @@ public class FigTest {
         Fig.configure(RuntimeEnvironment.application, c, f);
         assertTrue(c.getB().getA().isaBooleanPrimitive());
         assertEquals(99, c.getB().getA().getD());
+        assertEquals(2f, c.getB().getA().getF());
+        assertEquals(10f, c.getB().getA().getP());
     }
 
     private File getFileFromPath(String fileName) {
