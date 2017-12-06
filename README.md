@@ -28,7 +28,7 @@ b.paint.color="@color/red"
 
 ```groovy
 dependencies {
-    compile "com.halfhp.fig:library:1.0"
+    compile "com.halfhp.fig:library:1.0.4"
 }
 ```
 
