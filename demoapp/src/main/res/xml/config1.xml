@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <config
+    someBoolean="true"
+    someBooleanPrimitive="true"
+    someFloat="1.2"
+    someFloatPrimitive="1.2"
     someInt="99"
+    someIntPrimitive="99"
+    someHexColor="#FF0000"
+    someColor="red"
     someDp="@dimen/sixteen_dp"/>

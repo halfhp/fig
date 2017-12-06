@@ -115,16 +115,25 @@ public abstract class Fig {
     }
 
     protected static int parseIntAttr(Context ctx, String value) {
-        try {
-            return ctx.getResources().getColor(parseResId(ctx, "@color", value));
-        } catch (IllegalArgumentException e1) {
-            try {
-                return Color.parseColor(value);
-            } catch (IllegalArgumentException e2) {
-                // wasn't a color so try parsing as a plain old int:
-                return Integer.parseInt(value);
-            }
+        if(Character.isDigit(value.charAt(0))) {
+            return Integer.parseInt(value);
+        } else if(value.startsWith("@")){
+            return Color.parseColor(value);
+        } else {
+            // value starts with a non-digit char that is not '@' so it is either a color
+            // or an invalid value.
+            return Color.parseColor(value);
         }
+//        try {
+//            return ctx.getResources().getColor(parseResId(ctx, "@color", value));
+//        } catch (IllegalArgumentException e1) {
+//            try {
+//                return Color.parseColor(value);
+//            } catch (IllegalArgumentException e2) {
+//                // wasn't a color so try parsing as a plain old int:
+//                return Integer.parseInt(value);
+//            }
+//        }
     }
 
     /**
@@ -223,11 +232,11 @@ public abstract class Fig {
         for (Class param : params) {
             if (Enum.class.isAssignableFrom(param)) {
                 out[i] = param.getMethod("valueOf", String.class).invoke(null, vals[i].toUpperCase());
-            } else if (param.equals(Float.TYPE)) {
+            } else if (param.equals(Float.TYPE) || param == Float.class) {
                 out[i] = parseFloatAttr(ctx, vals[i]);
-            } else if (param.equals(Integer.TYPE)) {
+            } else if (param.equals(Integer.TYPE) || param == Integer.class) {
                 out[i] = parseIntAttr(ctx, vals[i]);
-            } else if (param.equals(Boolean.TYPE)) {
+            } else if (param.equals(Boolean.TYPE) || param == Boolean.class) {
                 out[i] = Boolean.valueOf(vals[i]);
             } else if (param.equals(String.class)) {
                 out[i] = parseStringAttr(ctx, vals[i]);
