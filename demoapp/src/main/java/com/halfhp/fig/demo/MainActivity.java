@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 
 import com.halfhp.fig.Fig;
+import com.halfhp.fig.FigException;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -15,7 +16,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        Fig.configure(this, foo, R.xml.config1);
+        try {
+            Fig.configure(this, foo, R.xml.config1);
+        } catch (FigException e) {
+            throw new RuntimeException(e);
+        }
 
         //assert(!foo.getSomeBoolean());
 

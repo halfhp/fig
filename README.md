@@ -5,30 +5,36 @@ A utility for Android apps to easily configure any object from XML.
  
 ## Why Use It?
 
-* Configure virtually any object; instances of Paint, View, etc.
+* Configure anything; instances of Paint, View, your own classes, third party libs, etc.
 * Supports `sp`, `dp`, `pix`, `pt`, `in`, `mm` and `color` params.
-* Keep your UI code where it belongs: store configurations by screen size and density using standard Android resource directory conventions.
-* Incredibly simple to use.
+* Keep UI code where it belongs: store configurations by screen size and density using standard 
+Android resource directory conventions.
+* Easy to use.
 
 # Usage
-In a nutshell, Fig uses JavaBean naming conventions to map XML parameters to objects:
+Fig relies on JavaBean naming conventions to map XML parameters to objects:
 
 ```java
-Button b = ...
-b.getPaint().setColor(Color.RED);
+// given:
+Button button = new Button();
+```
+
+then:
+```java
+button.getPaint().setColor(Color.RED);
 ```
 
 becomes:
 
 ```xml
-b.paint.color="@color/red"
+button.paint.color="@color/red"
 ```
 
 ### Gradle Dependency
 
 ```groovy
 dependencies {
-    compile "com.halfhp.fig:library:1.0.4"
+    compile "com.halfhp.fig:library:1.0.7"
 }
 ```
 
@@ -87,13 +93,13 @@ feel free to use whatever casing convention you prefer.
 
 # Fig & Obfuscation
 Fig uses runtime reflection to configure object instances and relies on  class method names remaining 
-consistent at runtime, therefore obfuscation must be disabled for any classes you wish to configure.
-This is typically as simple as adding a rule to your proguard config to preserve these class' members:
+consistent at runtime. Obfuscation must be disabled for any classes you wish to configure.
+This is typically a matter of adding a rule to your proguard config to preserve these class' members:
 
 ```
 # preserve a single class:
--keepclassmembers class com.halfhp.fig.Fig { *; }
+-keepclassmembers class com.somedomain.somepackage.Foo { *; }
 
 # preserve an entire package:
--keepclassmembers com.halfhp.fig.** { *; }
+-keepclassmembers com.somedomain.somepackage.** { *; }
 ```

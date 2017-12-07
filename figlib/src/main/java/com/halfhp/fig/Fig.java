@@ -3,7 +3,6 @@ package com.halfhp.fig;
 import android.content.Context;
 import android.content.res.XmlResourceParser;
 import android.graphics.Color;
-import android.util.Log;
 
 import org.xmlpull.v1.*;
 
@@ -13,95 +12,32 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 
 /**
- * Utility class for "configuring" objects via XML config files.  Supports the following field types:
- * String
- * Enum
- * int
- * float
- * boolean
- * <p/>
- * Config files should be stored in /res/xml.  Given the XML configuration /res/xml/myConfig.xml, one can apply the
- * configuration to an Object instance as follows:
- * <p/>
- * MyObject obj = new MyObject();
- * Configurator.configure(obj, R.xml.myConfig);
- * <p/>
- * WHAT IT DOES:
- * Given a series of parameters stored in an XML file, Configurator iterates through each parameter, using the name
- * as a map to the field within a given object.  For example:
- * <p/>
- * <pre>
- * {@code
- * <config car.engine.sparkPlug.condition="poor"/>
- * }
- * </pre>
- * <p/>
- * Given a Car instance car and assuming the method setCondition(String) exists within the SparkPlug class,
- * Configurator does the following:
- * <p/>
- * <pre>
- * {@code
- * car.getEngine().getSparkPlug().setCondition("poor");
- * }
- * </pre>
- * <p/>
- * Now let's pretend that setCondition takes an instance of the Condition enum as it's argument.
- * Configurator then does the following:
- * <p/>
- * car.getEngine().getSparkPlug().setCondition(Condition.valueOf("poor");
- * <p/>
- * Now let's look at how ints are handled.  Given the following xml:
- * <p/>
- * <config car.engine.miles="100000"/>
- * <p/>
- * would result in:
- * car.getEngine.setMiles(Integer.ParseInt("100000");
- * <p/>
- * That's pretty straight forward.  But colors are expressed as ints too in Android
- * but can be defined using hex values or even names of colors.  When Configurator
- * attempts to parse a parameter for a method that it knows takes an int as it's argument,
- * Configurator will first attempt to parse the parameter as a color.  Only after this
- * attempt fails will Configurator resort to Integer.ParseInt.  So:
- * <p/>
- * <config car.hood.paint.color="Red"/>
- * <p/>
- * would result in:
- * car.getHood().getPaint().setColor(Color.parseColor("Red");
- * <p/>
- * Next lets talk about float.  Floats can appear in XML a few different ways in Android,
- * especially when it comes to defining dimensions:
- * <p/>
- * <config height="10dp" depth="2mm" width="5em"/>
- * <p/>
- * Configurator will correctly parse each of these into their corresponding real pixel value expressed as a float.
- * <p/>
- * One last thing to keep in mind when using Configurator:
- * Values for Strings and ints can be assigned to localized values, allowing
- * a cleaner solution for those developing apps to run on multiple form factors
- * or in multiple languages:
- * <p/>
- * <config thingy.description="@string/thingyDescription"
- * thingy.titlePaint.textSize=""/>
+ * Public API for Fig
  */
 public abstract class Fig {
 
-    private static final String TAG = Fig.class.getName();
-    protected static final String CFG_ELEMENT_NAME = "config";
+    private static final String CFG_ELEMENT_NAME = "config";
+    private static final String PATH_SEPARATOR = "/";
+    private static final String DOT_SEPARATOR = ".";
+    private static final String RESOURCE_ID_PREFIX = "@";
+    private static final String GETTER_PREFIX = "get";
+    private static final String SETTER_PREFIX = "set";
+    private static final String COLOR_TRANSPARENT_COMPRESSED_HEX = "#0";
 
     /**
-     * Parses a resource id either as a raw string ref such as '@dimen/some_resource' or
+     * Parse a resource id either as a raw string ref such as '@dimen/some_resource' or
      * as a reference such as '@1234342'.
+     *
      * @param ctx
-     * @param prefix
      * @param value
      * @return The int resourceId corresponding to the input.
      * @throws IllegalArgumentException If the resoureId cannot be obtained from the input.
      */
-    protected static int parseResId(Context ctx, String prefix, String value) {
-        if(value.startsWith("@")){
-            if(value.contains("/")) {
-                String[] split = value.split("/");
-                String pack = split[0].replace("@", "");
+    private static int parseResId(Context ctx, String value) {
+        if (value.startsWith(RESOURCE_ID_PREFIX)) {
+            if (value.contains(PATH_SEPARATOR)) {
+                String[] split = value.split(PATH_SEPARATOR);
+                String pack = split[0].replace(RESOURCE_ID_PREFIX, "");
                 String name = split[1];
                 return ctx.getResources().getIdentifier(name, pack, ctx.getPackageName());
             } else {
@@ -109,20 +45,20 @@ public abstract class Fig {
                 // at compile time using the form '@intRef'
                 return Integer.parseInt(value.substring(1));
             }
-        }  else {
+        } else {
             throw new IllegalArgumentException();
         }
     }
 
-    protected static int parseIntAttr(Context ctx, String value) {
-        if(Character.isDigit(value.charAt(0))) {
+    private static int parseIntAttr(String value) {
+        if (Character.isDigit(value.charAt(0))) {
             return Integer.parseInt(value);
-        } else if(value.startsWith("@")){
+        } else if (value.startsWith(RESOURCE_ID_PREFIX)) {
             // it's a resId
             return Color.parseColor(value);
         } else {
             // it's a hex val
-            if(value.equalsIgnoreCase("#0")){
+            if (value.equalsIgnoreCase(COLOR_TRANSPARENT_COMPRESSED_HEX)) {
                 // for some reason, since gradle tools 3.x.x #00000000 gets
                 // converted to #0.
                 return Color.TRANSPARENT;
@@ -138,13 +74,14 @@ public abstract class Fig {
      * it contains a resource identifier.  Failing that, it is tested to see whether
      * a dimension suffix (dp, em, mm etc.) exists.  Failing that, it is evaluated as
      * a plain old float.
+     *
      * @param ctx
      * @param value
      * @return
      */
-    protected static float parseFloatAttr(Context ctx, String value) {
+    private static float parseFloatAttr(Context ctx, String value) {
         try {
-            return ctx.getResources().getDimension(parseResId(ctx, "@dimen", value));
+            return ctx.getResources().getDimension(parseResId(ctx, value));
         } catch (IllegalArgumentException e1) {
             try {
                 return FigUtils.stringToDimension(ctx, value);
@@ -154,15 +91,15 @@ public abstract class Fig {
         }
     }
 
-    protected static String parseStringAttr(Context ctx, String value) {
+    private static String parseStringAttr(Context ctx, String value) {
         try {
-            return ctx.getResources().getString(parseResId(ctx, "@string", value));
+            return ctx.getResources().getString(parseResId(ctx, value));
         } catch (IllegalArgumentException e1) {
             return value;
         }
     }
 
-    protected static Method getMethodByName(Class clazz, final String methodName)
+    private static Method getMethodByName(Class clazz, final String methodName)
             throws NoSuchMethodException {
         final Method[] methods = clazz.getMethods();
         for (Method method : methods) {
@@ -170,59 +107,50 @@ public abstract class Fig {
                 return method;
             }
         }
-
         throw new NoSuchMethodException("No such public method (case insensitive): " +
                 methodName + " in " + clazz);
     }
 
 
-    protected static Method getSetter(Class clazz, final String fieldId) throws NoSuchMethodException {
-        return getMethodByName(clazz, "set" + fieldId);
+    private static Method getSetter(Class clazz, final String fieldId) throws NoSuchMethodException {
+        return getMethodByName(clazz, SETTER_PREFIX + fieldId);
     }
 
-    protected static Method getGetter(Class clazz, final String fieldId) throws NoSuchMethodException {
-        return getMethodByName(clazz, "get" + fieldId);
+    private static Method getGetter(Class clazz, final String fieldId) throws NoSuchMethodException {
+        return getMethodByName(clazz, GETTER_PREFIX + fieldId);
     }
 
     /**
      * Returns the object containing the field specified by path.
+     *
      * @param obj
      * @param path Path through member hierarchy to the destination field.
      * @return null if the object at path cannot be found.
      * @throws java.lang.reflect.InvocationTargetException
-     *
      * @throws IllegalAccessException
      */
-    protected static Object getObjectContaining(Object obj, String path) throws
+    static Object getObjectContaining(Object obj, String path) throws
             InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        if(obj == null) {
-            throw new NullPointerException("Attempt to call getObjectContaining(Object obj, String path) " +
+        if (obj == null) {
+            throw new NullPointerException("Attempt to call getObjectContaining(...) " +
                     "on a null Object instance.  Path was: " + path);
         }
-        Log.d(TAG, "Looking up object containing: " + path);
-        int separatorIndex = path.indexOf(".");
-
-        // not there yet, descend deeper:
+        int separatorIndex = path.indexOf(DOT_SEPARATOR);
         if (separatorIndex > 0) {
             String lhs = path.substring(0, separatorIndex);
             String rhs = path.substring(separatorIndex + 1, path.length());
-
-            // use getter to retrieve the instance
             Method m = getGetter(obj.getClass(), lhs);
-            if(m == null) {
-                throw new NullPointerException("No getter found for field: " + lhs + " within " + obj.getClass());
+            if (m == null) {
+                throw new NoSuchMethodException("No getter found for field: " + lhs + " within " + obj.getClass());
             }
-            Log.d(TAG, "Invoking " + m.getName() + " on instance of " + obj.getClass().getName());
             Object o = m.invoke(obj);
-            // delve into o
             return getObjectContaining(o, rhs);
         } else {
-            // found it!
             return obj;
         }
     }
 
-    protected static Object[] inflateParams(Context ctx, Class[] params, String[] vals) throws NoSuchMethodException,
+    private static Object[] inflateParams(Context ctx, Class[] params, String[] vals) throws NoSuchMethodException,
             InvocationTargetException, IllegalAccessException {
         Object[] out = new Object[params.length];
         int i = 0;
@@ -232,14 +160,13 @@ public abstract class Fig {
             } else if (param.equals(Float.TYPE) || param == Float.class) {
                 out[i] = parseFloatAttr(ctx, vals[i]);
             } else if (param.equals(Integer.TYPE) || param == Integer.class) {
-                out[i] = parseIntAttr(ctx, vals[i]);
+                out[i] = parseIntAttr(vals[i]);
             } else if (param.equals(Boolean.TYPE) || param == Boolean.class) {
                 out[i] = Boolean.valueOf(vals[i]);
             } else if (param.equals(String.class)) {
                 out[i] = parseStringAttr(ctx, vals[i]);
             } else {
-                throw new IllegalArgumentException(
-                        "Error inflating XML: Setter requires param of unsupported type: " + param);
+                throw new IllegalArgumentException("Error inflating XML: Setter requires param of unsupported type: " + param);
             }
             i++;
         }
@@ -248,11 +175,13 @@ public abstract class Fig {
 
     /**
      * Configure from a File.
+     *
      * @param ctx
-     * @param obj The object to be configured
+     * @param obj  The object to be configured
      * @param file The file containing the config xml.
+     * @throws FigException
      */
-    public static void configure(Context ctx, Object obj, File file) {
+    public static void configure(Context ctx, Object obj, File file) throws FigException {
 
         try {
             XmlPullParserFactory xppf = XmlPullParserFactory.newInstance();
@@ -262,30 +191,33 @@ public abstract class Fig {
             xpp.setInput(fis, null);
             configure(ctx, obj, xpp);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            throw new FigException("Failed to open file for parsing", e);
         } catch (XmlPullParserException e) {
-            e.printStackTrace();
+            throw new FigException("Error while parsing file", e);
         }
     }
 
-    public static void configure(Context ctx, Object obj, HashMap<String, String> params) {
+    /**
+     * @param ctx
+     * @param obj
+     * @param params
+     * @throws FigException
+     */
+    public static void configure(Context ctx, Object obj, HashMap<String, String> params) throws FigException {
         for (String key : params.keySet()) {
-            try {
-                configure(ctx, obj, key, params.get(key));
-            } catch (InvocationTargetException e) {
-                e.printStackTrace();
-            } catch (IllegalAccessException e) {
-                e.printStackTrace();
-            } catch (NoSuchMethodException e) {
-                Log.w(TAG, "Error inflating XML: Setter for field \"" + key + "\" does not exist. ");
-                e.printStackTrace();
-            }
+            configure(ctx, obj, key, params.get(key));
         }
     }
 
-    private static void configure(Context ctx, Object obj, XmlPullParser xrp) {
+    /**
+     * @param ctx
+     * @param obj
+     * @param xrp
+     * @throws FigException
+     */
+    private static void configure(Context ctx, Object obj, XmlPullParser xrp) throws FigException {
         try {
-            HashMap<String, String> params = new HashMap<String, String>();
+            HashMap<String, String> params = new HashMap<>();
             while (xrp.getEventType() != XmlResourceParser.END_DOCUMENT) {
                 xrp.next();
                 String name = xrp.getName();
@@ -301,19 +233,21 @@ public abstract class Fig {
             }
             configure(ctx, obj, params);
         } catch (XmlPullParserException e) {
-            e.printStackTrace();
+            throw new FigException("Error while parsing XML configuration", e);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new FigException("Error while parsing XML configuration", e);
         }
     }
 
     /**
      * Configure from a res/xml resource
+     *
      * @param ctx
-     * @param obj The object to be configured
+     * @param obj       The object to be configured
      * @param xmlFileId ID of an XML config file in /res/xml
+     * @throws FigException
      */
-    public static void configure(Context ctx, Object obj, int xmlFileId) {
+    public static void configure(Context ctx, Object obj, int xmlFileId) throws FigException {
         XmlResourceParser xrp = ctx.getResources().getXml(xmlFileId);
         try {
             configure(ctx, obj, xrp);
@@ -328,45 +262,43 @@ public abstract class Fig {
      *
      * @param key
      * @param value
+     * @throws FigException
      */
-    protected static void configure(Context ctx, Object obj, String key, String value)
-            throws InvocationTargetException, IllegalAccessException, NoSuchMethodException {
-        Object o = getObjectContaining(obj, key);
-        if (o != null) {
-            int idx = key.lastIndexOf(".");
-            String fieldId = idx > 0 ? key.substring(idx + 1, key.length()) : key;
+    private static void configure(Context ctx, Object obj, String key, String value) throws FigException {
+        try {
+            Object o = getObjectContaining(obj, key);
+            if (o != null) {
+                int idx = key.lastIndexOf(DOT_SEPARATOR);
+                String fieldId = idx > 0 ? key.substring(idx + 1, key.length()) : key;
 
-            Method m = getSetter(o.getClass(), fieldId);
-            Class[] paramTypes = m.getParameterTypes();
-            // TODO: add support for generic type params
-            if (paramTypes.length >= 1) {
+                Method m = getSetter(o.getClass(), fieldId);
+                Class[] paramTypes = m.getParameterTypes();
+                // TODO: add support for generic type params
+                if (paramTypes.length >= 1) {
 
-                // split on "|"
-                // TODO: add support for String args containing a '|'
-                String[] paramStrs = value.split("\\|");
-                if (paramStrs.length == paramTypes.length) {
-                    Object[] oa = inflateParams(ctx, paramTypes, paramStrs);
-                    Log.d(TAG, "Invoking " + m.getName() + " with arg(s) " + argArrToString(oa));
-                    m.invoke(o, oa);
+                    // split on "|"
+                    // TODO: add support for String args containing a '|'
+                    String[] paramStrs = value.split("\\|");
+                    if (paramStrs.length == paramTypes.length) {
+                        Object[] oa = inflateParams(ctx, paramTypes, paramStrs);
+                        m.invoke(o, oa);
+                    } else {
+                        throw new IllegalArgumentException("Error inflating XML: Unexpected number of argments passed to \""
+                                + m.getName() + "\".  Expected: " + paramTypes.length + " Got: " + paramStrs.length);
+                    }
                 } else {
-                    throw new IllegalArgumentException("Error inflating XML: Unexpected number of argments passed to \""
-                            + m.getName() + "\".  Expected: " + paramTypes.length + " Got: " + paramStrs.length);
+                    // this is not a setter
+                    throw new IllegalArgumentException("Error inflating XML: no setter method found for param \"" +
+                            fieldId + "\".");
                 }
-            } else {
-                // this is not a setter
-                throw new IllegalArgumentException("Error inflating XML: no setter method found for param \"" +
-                        fieldId + "\".");
             }
+        } catch (IllegalAccessException e) {
+            throw new FigException("Error while parsing key: " + key + " value: " + value, e);
+        } catch (InvocationTargetException e) {
+            throw new FigException("Error while parsing key: " + key + " value: " + value, e);
+        } catch (NoSuchMethodException e) {
+            throw new FigException("Error while parsing key: " + key + " value: " + value, e);
         }
-    }
-
-    protected static String argArrToString(Object[] args) {
-        String out = "";
-        for(Object obj : args) {
-            out += (obj == null ? (out += "[null] ") :
-                    ("[" + obj.getClass() + ": " + obj + "] "));
-        }
-        return out;
     }
 }
 

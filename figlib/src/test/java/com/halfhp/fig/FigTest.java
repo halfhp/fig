@@ -102,14 +102,14 @@ public class FigTest {
         assertEquals(c.getB().getA(), Fig.getObjectContaining(c, "b.a.d"));
     }
 
-    @Test
-    public void testGetSetter() throws Exception {
-        C c = new C();
-
-        Method m = Fig.getSetter(c.getClass(), "b");
-        assertEquals(1, m.getParameterTypes().length);
-        assertEquals(B.class, m.getParameterTypes()[0]);
-    }
+//    @Test
+//    public void testGetSetter() throws Exception {
+//        C c = new C();
+//
+//        Method m = Fig.getSetter(c.getClass(), "b");
+//        assertEquals(1, m.getParameterTypes().length);
+//        assertEquals(B.class, m.getParameterTypes()[0]);
+//    }
 
     @Test
     public void testConfigure() throws Exception {
