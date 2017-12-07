@@ -6,6 +6,6 @@
     someFloatPrimitive="1.2"
     someInt="99"
     someIntPrimitive="99"
-    someHexColor="#FF0000"
+    someHexColor="#FFFFFFFF"
     someColor="red"
     someDp="@dimen/sixteen_dp"/>

@@ -118,22 +118,19 @@ public abstract class Fig {
         if(Character.isDigit(value.charAt(0))) {
             return Integer.parseInt(value);
         } else if(value.startsWith("@")){
+            // it's a resId
             return Color.parseColor(value);
         } else {
-            // value starts with a non-digit char that is not '@' so it is either a color
-            // or an invalid value.
-            return Color.parseColor(value);
+            // it's a hex val
+            if(value.equalsIgnoreCase("#0")){
+                // for some reason, since gradle tools 3.x.x #00000000 gets
+                // converted to #0.
+                return Color.TRANSPARENT;
+            } else {
+                // value starts with a non-digit char so its either a color, or an invalid value
+                return Color.parseColor(value);
+            }
         }
-//        try {
-//            return ctx.getResources().getColor(parseResId(ctx, "@color", value));
-//        } catch (IllegalArgumentException e1) {
-//            try {
-//                return Color.parseColor(value);
-//            } catch (IllegalArgumentException e2) {
-//                // wasn't a color so try parsing as a plain old int:
-//                return Integer.parseInt(value);
-//            }
-//        }
     }
 
     /**
@@ -286,7 +283,7 @@ public abstract class Fig {
         }
     }
 
-    protected static void configure(Context ctx, Object obj, XmlPullParser xrp) {
+    private static void configure(Context ctx, Object obj, XmlPullParser xrp) {
         try {
             HashMap<String, String> params = new HashMap<String, String>();
             while (xrp.getEventType() != XmlResourceParser.END_DOCUMENT) {
@@ -295,7 +292,9 @@ public abstract class Fig {
                 if (xrp.getEventType() == XmlResourceParser.START_TAG) {
                     if (name.equalsIgnoreCase(CFG_ELEMENT_NAME))
                         for (int i = 0; i < xrp.getAttributeCount(); i++) {
-                            params.put(xrp.getAttributeName(i), xrp.getAttributeValue(i));
+                            final String attrName = xrp.getAttributeName(i);
+                            final String attrVal = xrp.getAttributeValue(i);
+                            params.put(attrName, attrVal);
                         }
                     break;
                 }

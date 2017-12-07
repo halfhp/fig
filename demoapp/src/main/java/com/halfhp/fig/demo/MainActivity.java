@@ -34,11 +34,11 @@ public class MainActivity extends AppCompatActivity {
 
         final TextView someHexColor = findViewById(R.id.someHexColor);
         someHexColor.setText(String.valueOf(foo.getSomeHexColor()));
-        //assert(foo.getSomeHexColor() == 00);
+        someHexColor.setTextColor(foo.getSomeHexColor());
 
         final TextView someColor = findViewById(R.id.someColor);
-        someColor.setText(String.valueOf(foo.getSomeHexColor()));
-        //assert(foo.getSomeHexColor() == 00);
+        someColor.setText(String.valueOf(foo.getSomeColor()));
+        someColor.setTextColor(foo.getSomeColor());
 
         final TextView someDp = findViewById(R.id.someDp);
         someDp.setText(String.valueOf(foo.getSomeDp()));
