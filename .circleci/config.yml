@@ -75,9 +75,10 @@ jobs:
       - store_test_results:
           path: figlib/build/test-results/
 
-#      - deploy:
-#          name: "Deploy to Bintray"
-#          command: |
+      - deploy:
+          name: "Deploy to Bintray"
+          command: |
+            ./gradlew publish
 #            if [ "${CIRCLE_BRANCH}" == "master" ];
 #              then ./gradlew bintrayUpload;
 #            fi
