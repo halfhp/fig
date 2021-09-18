@@ -6,17 +6,13 @@ import org.robolectric.*;
 import org.robolectric.annotation.*;
 
 import java.io.*;
-import java.lang.reflect.Method;
 import java.net.*;
 
 import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertFalse;
 import static junit.framework.Assert.assertTrue;
-//import com.halfhp.fig.test.R;
 
 @RunWith(RobolectricTestRunner.class)
-//@Config(resourceDir = "figLib/test/res",
-//        manifest = "figLib/src/main/java/AndroidManifest.xml")
 @Config(manifest=Config.NONE)
 public class FigTest {
 
@@ -102,15 +98,6 @@ public class FigTest {
         assertEquals(c.getB().getA(), Fig.getObjectContaining(c, "b.a.d"));
     }
 
-//    @Test
-//    public void testGetSetter() throws Exception {
-//        C c = new C();
-//
-//        Method m = Fig.getSetter(c.getClass(), "b");
-//        assertEquals(1, m.getParameterTypes().length);
-//        assertEquals(B.class, m.getParameterTypes()[0]);
-//    }
-
     @Test
     public void testConfigure() throws Exception {
         C c = new C();
@@ -120,10 +107,11 @@ public class FigTest {
         // load xml config and verify:
         File f = getFileFromPath("c_config.xml");
         Fig.configure(RuntimeEnvironment.application, c, f);
+
         assertTrue(c.getB().getA().isaBooleanPrimitive());
         assertEquals(99, c.getB().getA().getD());
         assertEquals(2f, c.getB().getA().getF());
-        assertEquals(10f, c.getB().getA().getP());
+        assertEquals(6.6666665f, c.getB().getA().getP());
     }
 
     private File getFileFromPath(String fileName) {
