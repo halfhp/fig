@@ -7,6 +7,7 @@ ext {
     theMinSdkVersion = 5
     theVersionName = '1.0.11'
     theVersionCode = 1
+    gitUrl = 'https://github.com/halfhp/fig.git'
 }
 
 buildscript {

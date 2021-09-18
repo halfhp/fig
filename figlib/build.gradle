@@ -78,26 +78,26 @@ afterEvaluate {
             release(MavenPublication) {
                 pom {
                     packaging 'aar'
-                    name 'Fig'
+                    name = 'Fig'
                     description = "Configure any object from XML."
-                    url gitUrl
+                    url = gitUrl
                     licenses {
                         license {
-                            name 'The Apache Software License, Version 2.0'
-                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                            name = 'The Apache Software License, Version 2.0'
+                            url = 'http://www.apache.org/licenses/LICENSE-2.0.txt'
                         }
                     }
                     developers {
                         developer {
-                            id 'halfhp'
-                            name 'Nick Fellows'
-                            email 'halfhp@gmail.com'
+                            id ='halfhp'
+                            name = 'Nick Fellows'
+                            email = 'halfhp@gmail.com'
                         }
                     }
                     scm {
-                        connection gitUrl
-                        developerConnection gitUrl
-                        url gitUrl
+                        connection = gitUrl
+                        developerConnection = gitUrl
+                        url = gitUrl
 
                     }
                 }
