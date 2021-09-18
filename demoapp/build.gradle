@@ -1,5 +1,11 @@
 apply plugin: 'com.android.application'
 
+//repositories {
+//    maven {
+//        url "https://maven.pkg.github.com"
+//    }
+//}
+
 android {
     compileSdkVersion theCompileSdkVersion
 
