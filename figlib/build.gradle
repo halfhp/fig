@@ -58,13 +58,21 @@ afterEvaluate {
     publishing {
         repositories {
             maven {
-                name = "GitHubPackages"
-                url = "https://maven.pkg.github.com/halfhp/fig"
+                name = "Maven Central"
+                url = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
                 credentials {
-                    username = System.getenv("GITHUB_ACTOR")
-                    password = System.getenv("GITHUB_TOKEN")
+                    username = System.getenv("OSSRH_ACTOR")
+                    password = System.getenv("OSSRH_TOKEN")
                 }
             }
+//            maven {
+//                name = "GitHubPackages"
+//                url = "https://maven.pkg.github.com/halfhp/fig"
+//                credentials {
+//                    username = System.getenv("GITHUB_ACTOR")
+//                    password = System.getenv("GITHUB_TOKEN")
+//                }
+//            }
         }
         publications {
             release(MavenPublication) {
