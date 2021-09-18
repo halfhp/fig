@@ -1,26 +1,23 @@
 apply plugin: 'java'
 
 ext {
-    theBuildToolsVersion = '26.0.2'
-    theCompileSdkVersion = 26
-    theTargetSdkVersion = 26
+    theBuildToolsVersion = '30.0.2'
+    theCompileSdkVersion = 30
+    theTargetSdkVersion = 30
     theMinSdkVersion = 5
-    theVersionName = '1.0.7'
+    theVersionName = '1.0.9'
     theVersionCode = 1
 }
 
 buildscript {
     repositories {
         mavenCentral()
-        jcenter()
         google()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
-        classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.5.0'
+        classpath 'com.android.tools.build:gradle:7.0.2'
+        classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.15.0'
     }
 }
 
@@ -31,10 +28,3 @@ allprojects {
     }
 }
 
-//task clean(type: Delete) {
-//    delete rootProject.buildDir
-//}
-
-task wrapper(type: Wrapper) {
-    gradleVersion = '2.14.1'
-}
