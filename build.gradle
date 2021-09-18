@@ -1,9 +1,9 @@
 apply plugin: 'java'
 
 ext {
-    theBuildToolsVersion = '26.0.2'
-    theCompileSdkVersion = 26
-    theTargetSdkVersion = 26
+    theBuildToolsVersion = '30.0.2'
+    theCompileSdkVersion = 30
+    theTargetSdkVersion = 30
     theMinSdkVersion = 5
     theVersionName = '1.0.7'
     theVersionCode = 1
