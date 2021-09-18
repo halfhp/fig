@@ -76,6 +76,32 @@ afterEvaluate {
         }
         publications {
             release(MavenPublication) {
+                pom {
+                    packaging 'aar'
+                    name 'Fig'
+                    description = "Configure any object from XML."
+                    url gitUrl
+                    licenses {
+                        license {
+                            name 'The Apache Software License, Version 2.0'
+                            url 'http://www.apache.org/licenses/LICENSE-2.0.txt'
+                        }
+                    }
+                    developers {
+                        developer {
+                            id 'halfhp'
+                            name 'Nick Fellows'
+                            email 'halfhp@gmail.com'
+                        }
+                    }
+                    scm {
+                        connection gitUrl
+                        developerConnection gitUrl
+                        url gitUrl
+
+                    }
+                }
+
                 from components.release
 
                 // You can then customize attributes of the publication as shown below.
