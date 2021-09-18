@@ -58,21 +58,13 @@ afterEvaluate {
     publishing {
         repositories {
             maven {
-                name = "OSSRH"
-                url = "https://oss.sonatype.org/service/local/staging/deploy/maven2/"
+                name = "GitHubPackages"
+                url = "https://maven.pkg.github.com/halfhp/fig"
                 credentials {
-                    username = System.getenv("OSSRH_ACTOR")
-                    password = System.getenv("OSSRH_TOKEN")
+                    username = System.getenv("GITHUB_ACTOR")
+                    password = System.getenv("GITHUB_TOKEN")
                 }
             }
-//            maven {
-//                name = "GitHubPackages"
-//                url = "https://maven.pkg.github.com/halfhp/fig"
-//                credentials {
-//                    username = System.getenv("GITHUB_ACTOR")
-//                    password = System.getenv("GITHUB_TOKEN")
-//                }
-//            }
         }
         publications {
             release(MavenPublication) {
@@ -81,7 +73,7 @@ afterEvaluate {
                 // You can then customize attributes of the publication as shown below.
                 groupId = 'com.halfhp.fig'
                 artifactId = 'figlib'
-                version = '1.0'
+                version = theVersionName
             }
         }
     }

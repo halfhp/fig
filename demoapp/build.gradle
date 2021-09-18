@@ -1,11 +1,5 @@
 apply plugin: 'com.android.application'
 
-//repositories {
-//    maven {
-//        url "https://maven.pkg.github.com"
-//    }
-//}
-
 android {
     compileSdkVersion theCompileSdkVersion
 
@@ -14,7 +8,7 @@ android {
         minSdkVersion 14
         targetSdkVersion theTargetSdkVersion
         versionCode 1
-        versionName "1.0"
+        versionName theVersionName
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
@@ -28,6 +22,5 @@ android {
 }
 
 dependencies {
-    //implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation project(':figlib')
 }

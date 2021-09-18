@@ -33,6 +33,17 @@ button.paint.color="@color/red"
 ### Gradle Dependency
 
 ```groovy
+repositories {
+    ...
+    maven {
+        url "https://maven.pkg.github.com/halfhp/fig"
+        credentials {
+            username "anon"
+            password "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"
+        }
+    }
+}
+...
 dependencies {
     compile "com.halfhp.fig:library:1.0.7"
 }

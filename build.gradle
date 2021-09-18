@@ -5,21 +5,18 @@ ext {
     theCompileSdkVersion = 30
     theTargetSdkVersion = 30
     theMinSdkVersion = 5
-    theVersionName = '1.0.7'
+    theVersionName = '1.0.8'
     theVersionCode = 1
 }
 
 buildscript {
     repositories {
         mavenCentral()
-        jcenter()
         google()
     }
 
     dependencies {
         classpath 'com.android.tools.build:gradle:7.0.2'
-        classpath 'com.github.dcendents:android-maven-gradle-plugin:1.5'
-        classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.7'
         classpath 'com.vanniktech:gradle-android-junit-jacoco-plugin:0.15.0'
     }
 }
