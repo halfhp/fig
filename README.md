@@ -39,7 +39,7 @@ repositories {
         url "https://maven.pkg.github.com/halfhp/*"
         credentials {
             username "anon"
-            password "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"
+            password "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"
         }
     }
 }
