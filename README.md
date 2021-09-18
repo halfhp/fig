@@ -45,7 +45,7 @@ repositories {
 }
 ...
 dependencies {
-    compile "com.halfhp.fig:figlib:1.0.10"
+    compile "com.halfhp.fig:figlib:1.0.11"
 }
 ```
 
