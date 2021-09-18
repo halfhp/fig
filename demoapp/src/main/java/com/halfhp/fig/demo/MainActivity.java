@@ -1,13 +1,13 @@
 package com.halfhp.fig.demo;
 
-import android.support.v7.app.AppCompatActivity;
+import android.app.Activity;
 import android.os.Bundle;
 import android.widget.TextView;
 
 import com.halfhp.fig.Fig;
 import com.halfhp.fig.FigException;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends Activity {
 
     private Foo foo = new Foo();
 
@@ -22,14 +22,11 @@ public class MainActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
 
-        //assert(!foo.getSomeBoolean());
-
         final TextView someIntPrimitive = findViewById(R.id.someIntPrimitive);
         someIntPrimitive.setText(String.valueOf(foo.getSomeIntPrimitive()));
 
         final TextView someInt = findViewById(R.id.someInt);
         someInt.setText(String.valueOf(foo.getSomeInt()));
-        //assert(foo.getSomeInt() == 00);
 
         final TextView someFloat = findViewById(R.id.someFloat);
         someFloat.setText(String.valueOf(foo.getSomeFloat()));
