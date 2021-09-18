@@ -75,9 +75,13 @@ jobs:
       - store_test_results:
           path: figlib/build/test-results/
 
-      - deploy:
-          name: "Deploy to Github Packages"
-          run: ./gradlew publish
+      - run:
+          name: Deploy to Github Packages
+          command: ./gradlew publish
+
+#      - deploy:
+#          name: "Deploy to Github Packages"
+#          run: ./gradlew publish
 #          command: |
 #            if [ "${CIRCLE_BRANCH}" == "master" ];
 #              then ./gradlew bintrayUpload;
