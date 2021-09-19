@@ -2,6 +2,7 @@ plugins {
     id 'com.android.library'
     id 'com.vanniktech.android.junit.jacoco'
     id 'maven-publish'
+    id 'signing'
 }
 
 android {
@@ -110,6 +111,13 @@ afterEvaluate {
                 version = theVersionName
             }
         }
+    }
+
+    signing {
+        def signingKey = findProperty("SIGNING_KEY")
+        def signingPassword = findProperty("SIGNING_PASSWORD")
+        useInMemoryPgpKeys(signingKey, signingPassword)
+        sign publishing.publications.release
     }
 }
 
