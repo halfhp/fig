@@ -66,14 +66,6 @@ afterEvaluate {
                     password = System.getenv("OSSRH_TOKEN")
                 }
             }
-//            maven {
-//                name = "GitHubPackages"
-//                url = "https://maven.pkg.github.com/halfhp/fig"
-//                credentials {
-//                    username = System.getenv("GITHUB_ACTOR")
-//                    password = System.getenv("GITHUB_TOKEN")
-//                }
-//            }
         }
         publications {
             release(MavenPublication) {
