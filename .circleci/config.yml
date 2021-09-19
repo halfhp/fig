@@ -78,10 +78,9 @@ jobs:
       - deploy:
           name: "Deploy to Github Packages"
           command: |
-            ./gradlew publish
-#            if [ "${CIRCLE_BRANCH}" == "master" ];
-#              then ./gradlew publish
-#            fi
+            if [ "${CIRCLE_BRANCH}" == "master" ];
+              then ./gradlew publish
+            fi
 
 #      - deploy:
 #          name: "Deploy to Google Play"
