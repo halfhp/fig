@@ -77,6 +77,14 @@ afterEvaluate {
         }
         publications {
             release(MavenPublication) {
+
+                from components.release
+
+                // You can then customize attributes of the publication as shown below.
+                groupId = 'com.halfhp.fig'
+                artifactId = 'figlib'
+                version = theVersionName
+
                 pom {
                     packaging 'aar'
                     name = 'Fig'
@@ -90,7 +98,7 @@ afterEvaluate {
                     }
                     developers {
                         developer {
-                            id ='halfhp'
+                            id = 'halfhp'
                             name = 'Nick Fellows'
                             email = 'halfhp@gmail.com'
                         }
@@ -102,17 +110,12 @@ afterEvaluate {
 
                     }
                 }
-
-                from components.release
-
-                // You can then customize attributes of the publication as shown below.
-                groupId = 'com.halfhp.fig'
-                artifactId = 'figlib'
-                version = theVersionName
             }
         }
     }
+}
 
+afterEvaluate {
     signing {
         def signingKey = findProperty("SIGNING_KEY")
         def signingPassword = findProperty("SIGNING_PASSWORD")
